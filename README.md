@@ -6,16 +6,16 @@ A lightweight uptime monitoring tool written in JavaScript.
 
 **WARNING!**: *node.js* or *bun.js* is required to run this script.
 
-Just copy the `heartbeat.js` file to your server and run it with Node.js:
+Just copy the `heartbeat.mjs` file to your server and run it with Node.js:
 
 ```bash
-node heartbeat.js
+node heartbeat.mjs
 ```
 
 or
 
 ```bash
-./heartbeat.js
+./heartbeat.mjs
 ```
 
 ### Configuration
@@ -49,7 +49,7 @@ To use Discord Webhooks, set the environment variable `ALERT_DISCORD` with this 
 Example configuration:
 
 ```bash
-HTTP_PORT=8080 ALERT_DISCORD='https://discord.com/...;@everyone, Alert!' node heartbeat.js
+HTTP_PORT=8080 ALERT_DISCORD='https://discord.com/...;@everyone, Alert!' node heartbeat.mjs
 ```
 
 ### Receiving Heartbeats
