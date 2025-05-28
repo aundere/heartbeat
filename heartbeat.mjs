@@ -6,7 +6,48 @@ import { createServer, IncomingMessage, ServerResponse } from 'http'
 const HTTP_PORT = process.env.HTTP_PORT || 3000
 
 // Environment: NO_HEARTBEAT_TIME
-const NO_HEARTBEAT_TIME_SECONDS = process.env.NO_HEARTBEAT_TIME || 60 // 1 minute
+const NO_HEARTBEAT_TIME_SECONDS = process.env.NO_HEARTBEAT_TIME || 300 // 5 minutes
+
+/**
+ * @typedef {Object.<string, (status: HeartbeatStatus, params: string[]) => void>} HeartbeatServices
+ */
+
+/** @type {HeartbeatServices} */
+const services = {
+
+    // Discord Webhook service
+    // Usage: SERVICE_DISCORD="https://discord.com/...;Your message here"
+    discord: (_, [ url, message ]) => {
+        fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                content: message || `No heartbeat received in the last ${NO_HEARTBEAT_TIME_SECONDS} seconds`
+            })
+        }).catch(err => {
+            console.error(`Failed to send Discord alert: ${err.message}`)
+        })
+    }
+}
+
+/** @returns {(status: HeartbeatStatus) => void} */
+const createServiceFunction = (env, func) => {
+    return (status) => {
+        const params = env.split(';')
+        services[func](status, params)
+    }
+}
+
+/** @type {string[]} */
+const serviceEnvironmentVariables = Object.keys(process.env).filter(key => {
+    return key.startsWith('SERVICE_') && services[key.replace('SERVICE_', '').toLowerCase()]
+})
+
+/** @type {Array<Function>} */
+const serviceFunctions = serviceEnvironmentVariables.map(key => {
+    const funcName = key.replace('SERVICE_', '').toLowerCase()
+    return createServiceFunction(process.env[key], funcName)
+})
 
 /**
  * @typedef {Object} HeartbeatStatus
@@ -47,8 +88,10 @@ setInterval(() => {
     const allowedTime = Date.now() - (NO_HEARTBEAT_TIME_SECONDS * 1000)
 
     if (status.lastReceivedHeartbeat && status.lastReceivedHeartbeat < allowedTime && !status.isAlertRaised) {
-        console.warn(`*WARN* No heartbeat received in the last ${NO_HEARTBEAT_TIME_SECONDS} seconds`)
         status.isAlertRaised = true
+
+        console.warn(`*WARN* No heartbeat received in the last ${NO_HEARTBEAT_TIME_SECONDS} seconds`)
+        serviceFunctions.forEach(func => func(status))
     }
 }, 10_000 /* 10 seconds */)
 
