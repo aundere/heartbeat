@@ -13,10 +13,10 @@ const NO_HEARTBEAT_TIME_SECONDS = process.env.NO_HEARTBEAT_TIME || 300 // 5 minu
  */
 
 /** @type {HeartbeatServices} */
-const services = {
+const alertServices = {
 
     // Discord Webhook service
-    // Usage: SERVICE_DISCORD="https://discord.com/...;Your message here"
+    // Usage: ALERT_DISCORD="https://discord.com/...;Your message here"
     discord: (_, [ url, message ]) => {
         fetch(url, {
             method: 'POST',
@@ -34,18 +34,18 @@ const services = {
 const createServiceFunction = (env, func) => {
     return (status) => {
         const params = env.split(';')
-        services[func](status, params)
+        alertServices[func](status, params)
     }
 }
 
 /** @type {string[]} */
 const serviceEnvironmentVariables = Object.keys(process.env).filter(key => {
-    return key.startsWith('SERVICE_') && services[key.replace('SERVICE_', '').toLowerCase()]
+    return key.startsWith('ALERT_') && alertServices[key.replace('ALERT_', '').toLowerCase()]
 })
 
 /** @type {Array<Function>} */
 const serviceFunctions = serviceEnvironmentVariables.map(key => {
-    const funcName = key.replace('SERVICE_', '').toLowerCase()
+    const funcName = key.replace('ALERT_', '').toLowerCase()
     return createServiceFunction(process.env[key], funcName)
 })
 
