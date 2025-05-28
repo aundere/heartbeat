@@ -24,6 +24,7 @@ You can use environment variables to configure the script:
 
 - `HTTP_PORT` - The port on which the HTTP server will listen (default: `3000`)
 - `NO_HEARTBEAT_TIME` - The time in seconds after which the server will be     considered down if no heartbeat is received (default: `300`)
+- `SECRET_KEY` - A secret key for the heartbeat endpoint (default: empty). If set, the script will require this key to be sent in the `X-Secret-Key` header.
 
 The script supports only Discord Webhooks for notifications. You can add your own alerting services by modifying the `alertServices` array in the script. Example:
 

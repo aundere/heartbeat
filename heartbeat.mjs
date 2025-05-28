@@ -8,6 +8,9 @@ const HTTP_PORT = process.env.HTTP_PORT || 3000
 // Environment: NO_HEARTBEAT_TIME
 const NO_HEARTBEAT_TIME_SECONDS = process.env.NO_HEARTBEAT_TIME || 300 // 5 minutes
 
+// Environment: SECRET_KEY
+const SECRET_KEY = process.env.SECRET_KEY
+
 /**
  * @typedef {Object.<string, (status: HeartbeatStatus, params: string[]) => void>} HeartbeatServices
  */
@@ -83,6 +86,12 @@ const handleNotFound = (res) => {
     res.end('Not Found')
 }
 
+/** @param {ServerResponse<IncomingMessage>} res */
+const handleUnauthorized = (res) => {
+    res.writeHead(401, { 'Content-Type': 'text/plain' })
+    res.end('Unauthorized')
+}
+
 // Check for heartbeat every 10 seconds
 setInterval(() => {
     const allowedTime = Date.now() - (NO_HEARTBEAT_TIME_SECONDS * 1000)
@@ -100,8 +109,12 @@ createServer((req, res) => {
     // Log the request
     console.log(`${req.method} ${req.url} from ${req.socket.remoteAddress}:${req.socket.remotePort}`)
 
+    // Check for secret key
+    if (SECRET_KEY && req.headers['x-secret-key'] != SECRET_KEY)
+        handleUnauthorized(res)
+
     // GET /status
-    if (req.method == 'GET' && req.url === '/status')
+    else if (req.method == 'GET' && req.url === '/status')
         handleStatus(res)
     
     // POST /heartbeat
