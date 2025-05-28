@@ -35,7 +35,7 @@ const alertServices = {
 
 /** @returns {(status: HeartbeatStatus) => void} */
 const createServiceFunction = (env, func) => {
-    return (status) => {
+    return status => {
         const params = env.split(';')
         alertServices[func](status, params)
     }
@@ -64,7 +64,7 @@ const status = {
 }
 
 /** @param {ServerResponse<IncomingMessage>} res */
-const handleHeartbeat = (res) => {
+const handleHeartbeat = res => {
     if (status.lastReceivedHeartbeat == null)
         console.log('Received first heartbeat. Starting heartbeat checks')
 
@@ -75,19 +75,19 @@ const handleHeartbeat = (res) => {
 }
 
 /** @param {ServerResponse<IncomingMessage>} res */
-const handleStatus = (res) => {
+const handleStatus = res => {
     res.writeHead(200, { 'Content-Type': 'application/json' })
     return res.end(JSON.stringify(status))
 }
 
 /** @param {ServerResponse<IncomingMessage>} res */
-const handleNotFound = (res) => {
+const handleNotFound = res => {
     res.writeHead(404, { 'Content-Type': 'text/plain' })
     res.end('Not Found')
 }
 
 /** @param {ServerResponse<IncomingMessage>} res */
-const handleUnauthorized = (res) => {
+const handleUnauthorized = res => {
     res.writeHead(401, { 'Content-Type': 'text/plain' })
     res.end('Unauthorized')
 }
@@ -96,7 +96,7 @@ const handleUnauthorized = (res) => {
 setInterval(() => {
     const allowedTime = Date.now() - (NO_HEARTBEAT_TIME_SECONDS * 1000)
 
-    if (status.lastReceivedHeartbeat && status.lastReceivedHeartbeat < allowedTime && !status.isAlertRaised) {
+    if (!status.isAlertRaised && status.lastReceivedHeartbeat && status.lastReceivedHeartbeat < allowedTime) {
         status.isAlertRaised = true
 
         console.warn(`*WARN* No heartbeat received in the last ${NO_HEARTBEAT_TIME_SECONDS} seconds`)
@@ -116,7 +116,7 @@ createServer((req, res) => {
     // GET /status
     else if (req.method == 'GET' && req.url === '/status')
         handleStatus(res)
-    
+
     // POST /heartbeat
     else if (req.method == 'POST' && req.url === '/heartbeat')
         handleHeartbeat(res)
