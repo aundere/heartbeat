@@ -2,14 +2,13 @@
 
 import { createServer, IncomingMessage, ServerResponse } from 'http'
 
-// Environment: HTTP_PORT
-const HTTP_PORT = process.env.HTTP_PORT || 3000
-
-// Environment: NO_HEARTBEAT_TIME
+// Parsing environment variables
+const HTTP_PORT                 = process.env.HTTP_PORT         || 3000
+const BIND_ADDRESS              = process.env.BIND_ADDRESS      || '0.0.0.0'
 const NO_HEARTBEAT_TIME_SECONDS = process.env.NO_HEARTBEAT_TIME || 300 // 5 minutes
+const SECRET_KEY                = process.env.SECRET_KEY
 
-// Environment: SECRET_KEY
-const SECRET_KEY = process.env.SECRET_KEY
+// - - - - - - - - - - ALERT SERVICES - - - - - - - - - -
 
 /**
  * @typedef {Object.<string, (status: HeartbeatStatus, params: string[]) => void>} HeartbeatServices
@@ -52,6 +51,8 @@ const serviceFunctions = serviceEnvironmentVariables.map(key => {
     return createServiceFunction(process.env[key], funcName)
 })
 
+// - - - - - - - - - - STATUS - - - - - - - - - -
+
 /**
  * @typedef {Object} HeartbeatStatus
  * @property {number | null} lastReceivedHeartbeat
@@ -62,6 +63,8 @@ const status = {
     lastReceivedHeartbeat: null,
     isAlertRaised: false
 }
+
+// - - - - - - - - - - HANDLERS - - - - - - - - - -
 
 /** @param {ServerResponse<IncomingMessage>} res */
 const handleHeartbeat = res => {
@@ -91,6 +94,8 @@ const handleUnauthorized = res => {
     res.writeHead(401, { 'Content-Type': 'text/plain' })
     res.end('Unauthorized')
 }
+
+// - - - - - - - - - - SERVER - - - - - - - - - -
 
 // Check for heartbeat every 10 seconds
 setInterval(() => {
@@ -123,7 +128,7 @@ createServer((req, res) => {
 
     // Not Found
     else handleNotFound(res)
-}).listen(HTTP_PORT, () => {
-    console.log(`Heartbeat server running on port ${HTTP_PORT}`)
+}).listen(HTTP_PORT, BIND_ADDRESS, () => {
+    console.log(`Heartbeat server running on ${BIND_ADDRESS}:${HTTP_PORT}`)
     console.log('Note: Use POST /heartbeat to start heartbeat checks')
 })

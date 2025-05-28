@@ -1,10 +1,10 @@
 # heartbeat
 
-A lightweight uptime monitoring tool written in JavaScript.
+A lightweight server health check script with zero dependencies written in JavaScript.
 
 ## How to use
 
-**WARNING!**: *node.js* or *bun.js* is required to run this script.
+**WARNING!** Node.js or Bun is required to run this script. See the [Node.js](https://nodejs.org/) or [Bun](https://bun.sh/) documentation for installation instructions.
 
 Just copy the `heartbeat.mjs` file to your server and run it with Node.js:
 
@@ -23,8 +23,9 @@ or
 You can use environment variables to configure the script:
 
 - `HTTP_PORT` - The port on which the HTTP server will listen (default: `3000`)
+- `BIND_ADDRESS` - The address to bind the HTTP server to (default: `0.0.0.0`)
 - `NO_HEARTBEAT_TIME` - The time in seconds after which the server will be     considered down if no heartbeat is received (default: `300`)
-- `SECRET_KEY` - A secret key for the heartbeat endpoint (default: empty). If set, the script will require this key to be sent in the `X-Secret-Key` header.
+- `SECRET_KEY` - A secret key for the heartbeat endpoint. If set, the script will require this key to be sent in the `X-Secret-Key` header (default: empty)
 
 The script supports only Discord Webhooks for notifications. You can add your own alerting services by modifying the `alertServices` array in the script. Example:
 
