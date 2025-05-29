@@ -11,7 +11,7 @@ const SECRET_KEY                = process.env.SECRET_KEY
 // - - - - - - - - - - ALERT SERVICES - - - - - - - - - -
 
 /**
- * @typedef {Object.<string, (status: HeartbeatStatus, params: string[]) => void>} HeartbeatServices
+ * @typedef {Object.<string, (status: any, params: string[]) => void>} HeartbeatServices
  */
 
 /** @type {HeartbeatServices} */
@@ -47,7 +47,7 @@ const serviceEnvironmentVariables = Object.keys(process.env).filter(key => {
     return key.startsWith('ALERT_') && alertServices[key.replace('ALERT_', '').toLowerCase()]
 })
 
-/** @type {Array<Function>} */
+/** @type {Array<(status: any) => void>} */
 const serviceFunctions = serviceEnvironmentVariables.map(key => {
     const funcName = key.replace('ALERT_', '').toLowerCase()
     return createServiceFunction(process.env[key], funcName)
@@ -119,11 +119,11 @@ createServer((req, res) => {
         handleUnauthorized(res)
 
     // GET /status
-    else if (req.method == 'GET' && req.url === '/status')
+    else if (req.method == 'GET' && req.url == '/status')
         handleStatus(res)
 
     // POST /heartbeat
-    else if (req.method == 'POST' && req.url === '/heartbeat')
+    else if (req.method == 'POST' && req.url == '/heartbeat')
         handleHeartbeat(res)
 
     // Not Found
