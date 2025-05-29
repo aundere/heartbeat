@@ -30,6 +30,8 @@ const alertServices = {
             console.error(`Failed to send Discord alert: ${err.message}`)
         })
     }
+
+    // Put other services here as needed.
 }
 
 /** @returns {(status: HeartbeatStatus) => void} */
@@ -53,14 +55,12 @@ const serviceFunctions = serviceEnvironmentVariables.map(key => {
 
 // - - - - - - - - - - STATUS - - - - - - - - - -
 
-/**
- * @typedef {Object} HeartbeatStatus
- * @property {number | null} lastReceivedHeartbeat
- */
-
-/** @type {HeartbeatStatus} */
 const status = {
+
+    /** @type {number | null} */
     lastReceivedHeartbeat: null,
+
+    /** @type {boolean} */
     isAlertRaised: false
 }
 
@@ -80,7 +80,7 @@ const handleHeartbeat = res => {
 /** @param {ServerResponse<IncomingMessage>} res */
 const handleStatus = res => {
     res.writeHead(200, { 'Content-Type': 'application/json' })
-    return res.end(JSON.stringify(status))
+    res.end(JSON.stringify(status))
 }
 
 /** @param {ServerResponse<IncomingMessage>} res */
