@@ -1,21 +1,35 @@
 # heartbeat
 
-A lightweight server health check script with zero dependencies written in JavaScript.
+A lightweight health status server with zero dependencies written in JavaScript.
 
 ## How to use
 
-**WARNING!** Node.js or Bun is required to run this script. See the [Node.js](https://nodejs.org/) or [Bun](https://bun.sh/) documentation for installation instructions.
+Node.js or Bun is required to run this script. See the [Node.js](https://nodejs.org/) or [Bun](https://bun.sh/) documentation for installation instructions.
 
-Just copy the `heartbeat.mjs` file to your server and run it with Node.js:
+To run this script copy the `heartbeat.mjs` file to your server and run it with Node.js or Bun:
+
+### Node.js
 
 ```bash
 node heartbeat.mjs
 ```
 
-or
+or you can make it executable and run it directly this way:
+
+```bash
+chmod +x heartbeat.mjs # Only needed once to make the file executable
+```
+
+And then you can run it directly without `node`:
 
 ```bash
 ./heartbeat.mjs
+```
+
+### Bun
+
+```bash
+bun run heartbeat.mjs
 ```
 
 ### Configuration
